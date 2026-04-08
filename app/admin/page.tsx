@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { ShoppingBag, Clock, CheckCircle2, AlertTriangle, Lock } from 'lucide-react';
 import { siteConfig } from '@/site.config';
 
-const ADMIN_PASSWORD = 'artisan2024'; // In production, use NextAuth + proper auth
+// No password stored client-side — auth happens server-side via /api/admin/auth
 
 // Mock orders for demo purposes
 const mockOrders = [
@@ -55,15 +55,32 @@ export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState(mockOrders);
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-      setError('');
-    } else {
-      setError('Incorrect password.');
+    setLoading(true);
+    setError('');
+
+    try {
+      const res = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || 'Authentication failed.');
+      } else {
+        setAuthenticated(true);
+        setPassword('');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -98,9 +115,10 @@ export default function AdminPage() {
               {error && <p className="text-xs text-destructive">{error}</p>}
               <button
                 type="submit"
-                className="w-full rounded-lg bg-text px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-text/90"
+                disabled={loading}
+                className="w-full rounded-lg bg-text px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-text/90 disabled:opacity-50"
               >
-                Sign In
+                {loading ? 'Signing in...' : 'Sign In'}
               </button>
             </form>
           </div>

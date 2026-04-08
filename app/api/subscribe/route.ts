@@ -1,12 +1,46 @@
 import { NextResponse } from 'next/server';
+import { headers } from 'next/headers';
 
-// In production, store in database (Neon + Prisma) and optionally sync to Mailchimp
-const subscribers: string[] = [];
+// Simple in-memory rate limiter
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT = 3; // max subscribe attempts
+const RATE_WINDOW = 60 * 1000; // per minute
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now > entry.resetTime) {
+    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_WINDOW });
+    return false;
+  }
+
+  if (entry.count >= RATE_LIMIT) {
+    return true;
+  }
+
+  entry.count++;
+  return false;
+}
+
+// In production, store in database (Neon + Prisma)
+const subscribers = new Set<string>();
 
 export async function POST(request: Request) {
   try {
+    // Rate limiting
+    const headersList = await headers();
+    const ip = headersList.get('x-forwarded-for') || headersList.get('x-real-ip') || 'unknown';
+    
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: 'Too many requests. Please wait a minute.' },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
-    const { email } = body;
+    const email = (body.email || '').trim().toLowerCase().slice(0, 320);
 
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json(
@@ -15,23 +49,30 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check for duplicates (in production, use DB unique constraint)
-    if (subscribers.includes(email)) {
+    // Block disposable email domains (basic list)
+    const disposableDomains = ['tempmail.com', 'throwaway.email', 'guerrillamail.com', 'mailinator.com'];
+    const domain = email.split('@')[1];
+    if (disposableDomains.includes(domain)) {
+      return NextResponse.json(
+        { error: 'Please use a permanent email address.' },
+        { status: 400 }
+      );
+    }
+
+    // Honeypot
+    if (body._honeypot) {
+      return NextResponse.json({ success: true, message: 'Subscribed!' });
+    }
+
+    if (subscribers.has(email)) {
       return NextResponse.json({ 
         success: true, 
         message: 'You\'re already subscribed!' 
       });
     }
 
-    subscribers.push(email);
-    console.log('📬 New subscriber:', email, `(Total: ${subscribers.length})`);
-
-    // In production with Mailchimp:
-    // await fetch(`https://${DATACENTER}.api.mailchimp.com/3.0/lists/${LIST_ID}/members`, {
-    //   method: 'POST',
-    //   headers: { Authorization: `apikey ${MAILCHIMP_API_KEY}` },
-    //   body: JSON.stringify({ email_address: email, status: 'subscribed' }),
-    // });
+    subscribers.add(email);
+    console.log('📬 New subscriber:', email, `(Total: ${subscribers.size})`);
 
     return NextResponse.json({ 
       success: true, 
