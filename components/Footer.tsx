@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Coffee, MapPin, Phone, Clock, Instagram } from 'lucide-react';
 import Logo from './Logo';
 import { siteConfig } from '@/site.config';
+import NewsletterSignup from './NewsletterSignup';
 
 export default function Footer() {
   return (
@@ -58,7 +59,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Social */}
+          {/* Social & Newsletter */}
           <div>
             <h3 className="text-sm font-medium text-text mb-3">Follow Along</h3>
             <a
@@ -70,6 +71,12 @@ export default function Footer() {
               <Instagram className="h-4 w-4" />
               {siteConfig.socials.instagram}
             </a>
+
+            <div className="mt-5">
+              <h3 className="text-sm font-medium text-text mb-2">Stay in the Loop</h3>
+              <p className="text-xs text-text-muted mb-3">Exclusive deals & seasonal drops.</p>
+              <NewsletterSignup />
+            </div>
           </div>
         </div>
 

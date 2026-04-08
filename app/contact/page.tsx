@@ -42,10 +42,19 @@ export default function ContactPage() {
     if (!validate()) return;
 
     setLoading(true);
-    // Simulate API call
-    await new Promise((r) => setTimeout(r, 1200));
-    setLoading(false);
-    setSubmitted(true);
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!res.ok) throw new Error('Failed to send');
+      setSubmitted(true);
+    } catch {
+      alert('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleChange(field: keyof FormState, value: string) {

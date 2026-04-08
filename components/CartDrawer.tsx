@@ -2,6 +2,7 @@
 
 import { createPortal } from 'react-dom';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { cn } from './lib/cn';
 import { Minus, Plus, X, ShoppingBag } from 'lucide-react';
@@ -14,6 +15,7 @@ interface CartDrawerProps {
 export default function CartDrawer({ open, onClose }: CartDrawerProps) {
   const { items, removeItem, updateQuantity, clearCart, totalPrice, totalItems } = useCart();
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
@@ -144,7 +146,10 @@ export default function CartDrawer({ open, onClose }: CartDrawerProps) {
               </div>
               <button
                 type="button"
-                onClick={() => alert('Checkout flow is currently a mock. Integration coming soon!')}
+                onClick={() => {
+                  onClose();
+                  router.push('/checkout');
+                }}
                 className={cn(
                   'w-full flex items-center justify-center gap-2 rounded-lg px-4 py-3 text-base font-semibold transition-all duration-150',
                   'bg-text text-white hover:bg-accent active:scale-95'
