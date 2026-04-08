@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Coffee, MapPin, Phone, Clock, Instagram } from 'lucide-react';
 import Logo from './Logo';
+import { siteConfig } from '@/site.config';
 
 export default function Footer() {
   return (
@@ -61,22 +62,26 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-medium text-text mb-3">Follow Along</h3>
             <a
-              href="https://instagram.com"
+              href={siteConfig.socials.instagramUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 text-sm text-text-muted hover:text-text transition-colors"
             >
               <Instagram className="h-4 w-4" />
-              @artisan.cafe
+              {siteConfig.socials.instagram}
             </a>
           </div>
         </div>
 
         <div className="mt-12 pt-6 border-t border-surface-muted flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-text-light">&copy; {new Date().getFullYear()} Artisan Cafe. All rights reserved.</p>
-          <div className="flex items-center gap-1.5 text-xs text-text-light">
-            <Coffee className="h-3 w-3" />
-            <span>Brewed in Brooklyn</span>
+          <p className="text-xs text-text-light">&copy; {new Date().getFullYear()} {siteConfig.name}. All rights reserved.</p>
+          <div className="flex items-center gap-4 text-xs text-text-light">
+            <Link href="/privacy" className="hover:text-text transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-text transition-colors">Terms</Link>
+            <span className="flex items-center gap-1.5">
+              <Coffee className="h-3 w-3" />
+              Brewed in Brooklyn
+            </span>
           </div>
         </div>
       </div>

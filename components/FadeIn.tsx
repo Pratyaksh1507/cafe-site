@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ReactNode } from 'react';
 
 /**
@@ -64,13 +64,17 @@ export function FadeIn({
   direction?: 'up' | 'down' | 'left' | 'right' | 'none';
   distance?: number;
 }) {
+  const shouldReduceMotion = useReducedMotion();
+
   let y = 0;
   let x = 0;
 
-  if (direction === 'up') y = distance;
-  if (direction === 'down') y = -distance;
-  if (direction === 'left') x = distance;
-  if (direction === 'right') x = -distance;
+  if (!shouldReduceMotion) {
+    if (direction === 'up') y = distance;
+    if (direction === 'down') y = -distance;
+    if (direction === 'left') x = distance;
+    if (direction === 'right') x = -distance;
+  }
 
   return (
     <motion.div
@@ -78,7 +82,7 @@ export function FadeIn({
       initial={{ opacity: 0, y, x }}
       whileInView={{ opacity: 1, y: 0, x: 0 }}
       viewport={{ once: true, margin: '-50px' }}
-      transition={{ ...elegantTransition, delay }}
+      transition={{ ...elegantTransition, delay: shouldReduceMotion ? 0 : delay }}
       variants={{
         hidden: { opacity: 0, y, x },
         visible: { opacity: 1, y: 0, x: 0, transition: elegantTransition },

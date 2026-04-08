@@ -3,11 +3,12 @@ import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Providers from '@/context/Providers';
+import CookieBanner from '@/components/CookieBanner';
+import { siteConfig } from '@/site.config';
 
 export const metadata: Metadata = {
-  title: 'Artisan Cafe | Specialty Coffee in Brooklyn',
-  description:
-    'Neighborhood specialty coffee shop in Brooklyn. Hand-crafted espresso, pastries, and light fare. Open daily.',
+  title: `${siteConfig.name} | Specialty Coffee in Brooklyn`,
+  description: siteConfig.description,
 };
 
 export default function RootLayout({
@@ -22,6 +23,7 @@ export default function RootLayout({
           <Navbar />
           <main id="main-content" className="flex-1">{children}</main>
           <Footer />
+          <CookieBanner />
         </Providers>
       </body>
     </html>

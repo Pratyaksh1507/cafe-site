@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import type { MenuItem } from '@/data/menu';
 import { cn } from './lib/cn';
 import CartItemButton from './CartItemButton';
@@ -50,19 +51,20 @@ export default function MenuCard({ item, priority = false }: MenuCardProps) {
             <span className="text-text-light text-sm font-medium">{item.name}</span>
           </div>
         ) : (
-            <img
+            <Image
               src={item.image}
               alt={item.imageAlt}
-              loading={priority ? 'eager' : 'lazy'}
-              fetchPriority={priority ? 'high' : 'auto'}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              priority={priority}
               className={cn(
-              'w-full h-full object-cover transition-opacity duration-300 group-hover:scale-105 group-hover:brightness-95',
-              imgLoaded ? 'opacity-100' : 'opacity-0',
-              item.soldOut && 'grayscale opacity-80'
-            )}
-            onLoad={() => setImgLoaded(true)}
-            onError={() => setImgError(true)}
-          />
+                'object-cover transition-opacity duration-300 group-hover:scale-105 group-hover:brightness-95',
+                imgLoaded ? 'opacity-100' : 'opacity-0',
+                item.soldOut && 'grayscale opacity-80'
+              )}
+              onLoad={() => setImgLoaded(true)}
+              onError={() => setImgError(true)}
+            />
         )}
       </div>
 
