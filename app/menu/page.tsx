@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { MenuItem } from '@/data/menu';
-import { menuItems } from '@/data/menu';
+import { menuItems as fallbackItems } from '@/data/menu';
 import MenuCard from '@/components/MenuCard';
 import CategoryFilter from '@/components/CategoryFilter';
 import { FadeIn, StaggerContainer } from '@/components/FadeIn';
@@ -10,19 +10,34 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 export default function MenuPage() {
   const [active, setActive] = useState('all');
+  const [items, setItems] = useState<MenuItem[]>(fallbackItems);
+
+  // Fetch live menu from API (reflects admin changes)
+  useEffect(() => {
+    fetch('/api/admin/menu')
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.items && data.items.length > 0) {
+          setItems(data.items);
+        }
+      })
+      .catch(() => {
+        // Fallback to hardcoded data if API fails
+      });
+  }, []);
 
   return (
-    <MenuContent active={active} onFilterChange={setActive} />
+    <MenuContent items={items} active={active} onFilterChange={setActive} />
   );
 }
 
-function MenuContent({ active, onFilterChange }: { active: string; onFilterChange: (slug: string) => void }) {
+function MenuContent({ items, active, onFilterChange }: { items: MenuItem[]; active: string; onFilterChange: (slug: string) => void }) {
   const filtered: MenuItem[] =
     active === 'all'
-      ? menuItems
+      ? items
       : active === 'seasonal'
-        ? menuItems.filter((i) => i.seasonal)
-        : menuItems.filter((i) => i.category === active);
+        ? items.filter((i) => i.seasonal)
+        : items.filter((i) => i.category === active);
 
   return (
     <div className="pt-16">
