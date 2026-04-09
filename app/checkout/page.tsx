@@ -73,11 +73,34 @@ export default function CheckoutPage() {
 
   async function handlePayment() {
     setLoading(true);
-    // Simulate payment processing (replace with Razorpay in production)
-    await new Promise((r) => setTimeout(r, 2000));
-    clearCart();
-    setStep('success');
-    setLoading(false);
+    try {
+      // Simulate real payment delay, then post to our fake backend
+      await new Promise((r) => setTimeout(r, 1000));
+      
+      const payload = {
+        customerName,
+        customerEmail,
+        customerPhone,
+        pickupTime,
+        items,
+        total: totalPrice,
+      };
+
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error('Order failed');
+
+      clearCart();
+      setStep('success');
+    } catch (error) {
+      alert('Failed to process payment. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

@@ -9,50 +9,15 @@ import {
 import { siteConfig } from '@/site.config';
 import type { MenuItem } from '@/data/menu';
 
-// Mock orders for demo
-const mockOrders = [
-  {
-    id: 'ORD-001',
-    customerName: 'Priya M.',
-    items: [
-      { name: 'Oat Milk Latte', qty: 2, price: 5.5 },
-      { name: 'Butter Croissant', qty: 1, price: 4.0 },
-    ],
-    total: 15.0,
-    pickupTime: '10:30 AM',
-    status: 'pending' as const,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'ORD-002',
-    customerName: 'Marcus T.',
-    items: [
-      { name: 'Cold Brew', qty: 1, price: 5.0 },
-      { name: 'Avocado Toast', qty: 1, price: 12.0 },
-    ],
-    total: 17.0,
-    pickupTime: '11:00 AM',
-    status: 'ready' as const,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: 'ORD-003',
-    customerName: 'Sophia L.',
-    items: [{ name: 'Matcha Latte', qty: 1, price: 5.5 }],
-    total: 5.5,
-    pickupTime: '9:15 AM',
-    status: 'completed' as const,
-    createdAt: new Date().toISOString(),
-  },
-];
-
-type OrderStatus = 'pending' | 'ready' | 'completed';
+// No more mockOrders! We fetch from Supabase.
+type OrderStatus = 'pending' | 'ready' | 'completed' | 'cancelled';
 type AdminTab = 'orders' | 'menu';
 
 const statusConfig: Record<OrderStatus, { label: string; color: string; icon: typeof Clock }> = {
   pending: { label: 'Pending', color: 'bg-amber-100 text-amber-800', icon: Clock },
   ready: { label: 'Ready', color: 'bg-blue-100 text-blue-800', icon: AlertTriangle },
   completed: { label: 'Completed', color: 'bg-green-100 text-green-800', icon: CheckCircle2 },
+  cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-800', icon: AlertTriangle },
 };
 
 export default function AdminPage() {
@@ -60,7 +25,8 @@ export default function AdminPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [orders, setOrders] = useState(mockOrders);
+  const [orders, setOrders] = useState<any[]>([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
   const [tab, setTab] = useState<AdminTab>('orders');
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [menuLoading, setMenuLoading] = useState(false);
@@ -95,12 +61,28 @@ export default function AdminPage() {
     }
   }
 
-  // Fetch menu items when authenticated
+  // Fetch data when authenticated
   useEffect(() => {
     if (authenticated) {
       fetchMenu();
+      fetchOrders();
     }
   }, [authenticated]);
+
+  async function fetchOrders() {
+    setOrdersLoading(true);
+    try {
+      const res = await fetch('/api/admin/orders');
+      const data = await res.json();
+      if (res.ok && data.orders) {
+        setOrders(data.orders);
+      }
+    } catch (err) {
+      console.error('Failed to fetch orders');
+    } finally {
+      setOrdersLoading(false);
+    }
+  }
 
   async function fetchMenu() {
     setMenuLoading(true);
@@ -192,10 +174,21 @@ export default function AdminPage() {
     }
   }
 
-  function updateOrderStatus(orderId: string, newStatus: OrderStatus) {
-    setOrders((prev) =>
-      prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
-    );
+  async function updateOrderStatus(orderId: string, newStatus: OrderStatus) {
+    try {
+      const res = await fetch('/api/admin/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: orderId, status: newStatus }),
+      });
+      if (res.ok) {
+        setOrders((prev) =>
+          prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
+        );
+      }
+    } catch {
+      alert('Failed to update order status');
+    }
   }
 
   // ── Login Screen ──
@@ -311,7 +304,7 @@ export default function AdminPage() {
             <h2 className="text-lg font-semibold text-text mb-4">Today&apos;s Orders</h2>
             <div className="space-y-4">
               {orders.map((order) => {
-                const config = statusConfig[order.status];
+                const config = statusConfig[order.status as OrderStatus] || statusConfig['pending'];
                 const StatusIcon = config.icon;
                 return (
                   <div key={order.id} className="bg-surface rounded-xl border border-surface-muted p-5">
@@ -328,7 +321,7 @@ export default function AdminPage() {
                           <strong className="text-text">{order.customerName}</strong> — Pickup at {order.pickupTime}
                         </p>
                         <div className="mt-2 text-xs text-text-light">
-                          {order.items.map((item, i) => (
+                          {order.items.map((item: any, i: number) => (
                             <span key={i}>
                               {item.qty}× {item.name}
                               {i < order.items.length - 1 && ' · '}
