@@ -22,6 +22,10 @@ CREATE TABLE IF NOT EXISTS menu_items (
 -- =====================
 -- 2. ORDERS TABLE
 -- =====================
+
+-- Sequence for order IDs
+CREATE SEQUENCE IF NOT EXISTS order_seq START 1;
+
 CREATE TABLE IF NOT EXISTS orders (
   id TEXT PRIMARY KEY DEFAULT 'ORD-' || LPAD(nextval('order_seq')::TEXT, 4, '0'),
   customer_name TEXT NOT NULL,
@@ -33,9 +37,6 @@ CREATE TABLE IF NOT EXISTS orders (
   status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'ready', 'completed', 'cancelled')),
   created_at TIMESTAMPTZ DEFAULT now()
 );
-
--- Sequence for order IDs
-CREATE SEQUENCE IF NOT EXISTS order_seq START 1;
 
 -- =====================
 -- 3. SUBSCRIBERS TABLE
