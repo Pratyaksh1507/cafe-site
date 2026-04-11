@@ -39,7 +39,8 @@ CREATE TABLE IF NOT EXISTS orders (
 );
 
 -- =====================
--- 3. SUBSCRIBERS TABLE
+-- 3. SUBSCRIBER
+S TABLE
 -- =====================
 CREATE TABLE IF NOT EXISTS subscribers (
   id SERIAL PRIMARY KEY,
