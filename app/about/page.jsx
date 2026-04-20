@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { ArrowRight, Heart, Users, Globe, Sparkles } from 'lucide-react';
 import HoursDisplay from '@/components/HoursDisplay';
 import { FadeIn, StaggerContainer } from '@/components/FadeIn';
@@ -35,21 +36,25 @@ const team = [
     name: 'Elena Vasquez',
     role: 'Founder & Head Roaster',
     bio: 'Former architect turned coffee obsessive. Sources beans from 12 countries and roasts them in a 6-kilo mill just off our bar.',
+    image: '/images/team/elena.png',
   },
   {
     name: 'James Okonkwo',
     role: 'Head Barista',
     bio: 'Went from regular to head barista in two years. Known for latte art that people photograph before drinking.',
+    image: '/images/team/james.png',
   },
   {
     name: 'Mei-Lin Chen',
     role: 'Pastry Chef',
     bio: 'Trained at the Culinary Institute, fell in love with sourdough. Every pastry is made from scratch before 6am.',
+    image: '/images/team/meilin.png',
   },
   {
     name: 'Dev Patel',
     role: 'Operations',
     bio: 'Former project manager who runs the backend — scheduling, inventory, and making sure the espresso machine never goes down.',
+    image: '/images/team/dev.png',
   },
 ];
 
@@ -102,8 +107,14 @@ export default function AboutPage() {
               </div>
             </FadeIn>
             <FadeIn direction="left">
-              <div className="aspect-square bg-gradient-to-br from-surface-muted to-bg rounded-xl flex items-center justify-center">
-                <span className="text-text-light text-sm">Brooklyn, 2018</span>
+              <div className="aspect-square bg-bg-alt rounded-xl relative overflow-hidden shadow-lg border border-surface-muted">
+                <Image
+                  src="/images/about/story.png"
+                  alt="Artisan Cafe Brooklyn 2018 inside loft space"
+                  fill
+                  className="object-cover transition-transform duration-700 hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
               </div>
             </FadeIn>
           </div>
@@ -159,8 +170,14 @@ export default function AboutPage() {
                 <div
                   className="bg-surface rounded-xl border border-surface-muted overflow-hidden h-full"
                 >
-                  <div className="aspect-square bg-gradient-to-br from-surface-muted to-bg flex items-center justify-center">
-                    <span className="text-text-light text-sm">{member.name}</span>
+                  <div className="aspect-square bg-bg-alt relative overflow-hidden">
+                    <Image
+                      src={member.image}
+                      alt={member.name}
+                      fill
+                      className="object-cover transition-transform duration-500 hover:scale-105"
+                      sizes="(max-width: 768px) 100vw, 25vw"
+                    />
                   </div>
                   <div className="p-5">
                     <h3 className="text-base font-semibold text-text">{member.name}</h3>

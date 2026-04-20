@@ -62,7 +62,7 @@ export default function ContactPage() {
   }
 
   const inputClass = (field) =>
-    `w-full rounded-lg border bg-surface px-4 py-3 text-sm text-text placeholder:text-text-light transition-colors duration-150 focus:outline-none ${
+    `w-full rounded-lg border bg-bg-alt px-4 py-3 text-sm text-text placeholder:text-text-light transition-colors duration-150 focus:outline-none ${
       errors[field]
         ? 'border-destructive focus:border-destructive'
         : 'border-surface-muted focus:border-text'

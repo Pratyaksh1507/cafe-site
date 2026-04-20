@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
 import { cn } from './lib/cn';
 import { Minus, Plus, X, ShoppingBag } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function CartDrawer({ open, onClose }) {
   const { items, removeItem, updateQuantity, clearCart, totalPrice, totalItems } = useCart();
@@ -83,11 +84,17 @@ export default function CartDrawer({ open, onClose }) {
               </div>
             ) : (
               <ul className="space-y-4">
-                {items.map((item) => (
-                  <li
-                    key={item.id}
-                    className="flex items-center gap-4 py-3 px-4 mb-3 last:mb-0 bg-bg rounded-xl border border-surface-muted shadow-sm"
-                  >
+                <AnimatePresence initial={false}>
+                  {items.map((item) => (
+                    <motion.li
+                      key={item.id}
+                      layoutId={`cart-item-${item.id}`}
+                      initial={{ opacity: 0, y: 20, scale: 0.9 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      transition={{ duration: 0.2 }}
+                      className="flex items-center gap-4 py-3 px-4 mb-3 last:mb-0 bg-bg rounded-xl border border-surface-muted shadow-sm"
+                    >
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-text truncate">{item.name}</p>
                       <p className="text-sm text-text-muted">${item.price.toFixed(2)}</p>
@@ -124,8 +131,9 @@ export default function CartDrawer({ open, onClose }) {
                     <span className="w-16 text-right text-sm font-semibold tabular-nums text-text">
                       ${(item.price * item.quantity).toFixed(2)}
                     </span>
-                  </li>
+                  </motion.li>
                 ))}
+              </AnimatePresence>
               </ul>
             )}
           </div>

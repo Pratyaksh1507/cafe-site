@@ -1,9 +1,17 @@
+import { DM_Sans } from 'next/font/google';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import Providers from '@/context/Providers';
 import CookieBanner from '@/components/CookieBanner';
+import SmoothScroller from '@/components/SmoothScroller';
 import { siteConfig } from '@/site.config';
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-dm-sans',
+});
 
 export const metadata = {
   metadataBase: new URL(siteConfig.url),
@@ -51,13 +59,15 @@ export const viewport = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className="min-h-screen flex flex-col antialiased">
-        <Providers>
-          <Navbar />
-          <main id="main-content" className="flex-1">{children}</main>
-          <Footer />
-          <CookieBanner />
-        </Providers>
+      <body className={`${dmSans.variable} font-sans min-h-screen flex flex-col antialiased`}>
+        <SmoothScroller>
+          <Providers>
+            <Navbar />
+            <main id="main-content" className="flex-1">{children}</main>
+            <Footer />
+            <CookieBanner />
+          </Providers>
+        </SmoothScroller>
       </body>
     </html>
   );

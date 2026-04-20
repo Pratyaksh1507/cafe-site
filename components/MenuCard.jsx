@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { motion } from 'framer-motion';
 import { cn } from './lib/cn';
 import CartItemButton from './CartItemButton';
 
@@ -24,9 +25,6 @@ const tagStyles = {
 };
 
 export default function MenuCard({ item, priority = false }) {
-  const [imgLoaded, setImgLoaded] = useState(false);
-  const [imgError, setImgError] = useState(false);
-
   return (
     <div
       className={cn(
@@ -34,46 +32,34 @@ export default function MenuCard({ item, priority = false }) {
       )}
     >
       {/* Image */}
-      <div className="aspect-[4/3] bg-bg-alt overflow-hidden relative">
-        {!imgLoaded && !imgError && (
-          <div className="absolute inset-0 bg-gradient-to-br from-surface-muted to-bg flex items-center justify-center">
-            <div className="w-8 h-8 border-2 border-text-light/30 border-t-text-light rounded-full animate-spin" />
-          </div>
-        )}
-        {imgError ? (
-          <div className="w-full h-full bg-gradient-to-br from-surface-muted to-bg flex items-center justify-center">
-            <span className="text-text-light text-sm font-medium">{item.name}</span>
-          </div>
-        ) : (
-          <Image
-            src={item.image}
-            alt={item.imageAlt}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            priority={priority}
-            className={cn(
-              'object-cover transition-[opacity,transform] duration-300 ease-in-out group-hover:scale-105 group-hover:brightness-95 group-hover:duration-700',
-              imgLoaded ? 'opacity-100' : 'opacity-0',
-              item.soldOut && 'grayscale opacity-80'
-            )}
-            onLoad={() => setImgLoaded(true)}
-            onError={() => setImgError(true)}
-          />
-        )}
-      </div>
+      <motion.div layoutId={`image-${item.id}`} className="aspect-[4/3] bg-bg-alt overflow-hidden relative">
+        <Image
+          src={item.image}
+          alt={item.imageAlt || item.name}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          priority={priority}
+          placeholder="blur"
+          blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mO8+hgAAtsB1P0f95wAAAAASUVORK5CYII="
+          className={cn(
+            'object-cover transition-transform duration-700 ease-in-out group-hover:scale-105 group-hover:brightness-95',
+            item.soldOut && 'grayscale opacity-80'
+          )}
+        />
+      </motion.div>
 
       {/* Content */}
       <div className="p-4 flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-base font-semibold text-text group-hover:text-accent transition-colors duration-150">
+        <div className="flex items-start justify-between gap-1 sm:gap-2">
+          <h3 className="text-sm sm:text-base font-semibold text-text group-hover:text-accent transition-colors duration-150">
             {item.name}
           </h3>
-          <span className="text-base font-bold tabular-nums text-text shrink-0">
+          <span className="text-sm sm:text-base font-bold tabular-nums text-text shrink-0">
             ${item.price.toFixed(2)}
           </span>
         </div>
 
-        <p className="mt-1 text-sm text-text-muted leading-snug">{item.description}</p>
+        <p className="mt-1 text-xs sm:text-sm text-text-muted leading-snug line-clamp-2 sm:line-clamp-none">{item.description}</p>
 
         {/* Tags */}
         <div className="mt-3 flex flex-wrap gap-1.5">
@@ -83,14 +69,14 @@ export default function MenuCard({ item, priority = false }) {
             return (
               <span
                 key={tag}
-                className={cn('inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium', style.bg, style.text)}
+                className={cn('inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium', style.bg, style.text)}
               >
                 {style.label}
               </span>
             );
           })}
           {item.seasonal && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-accent/10 text-accent">
+            <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-accent/10 text-accent">
               Seasonal
             </span>
           )}

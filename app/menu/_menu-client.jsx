@@ -1,26 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { menuItems as fallbackItems } from '@/data/menu';
+import { useState } from 'react';
 import MenuCard from '@/components/MenuCard';
 import CategoryFilter from '@/components/CategoryFilter';
 import { FadeIn, StaggerContainer } from '@/components/FadeIn';
 import { motion, AnimatePresence } from 'framer-motion';
 
-export default function MenuContent() {
+export default function MenuContent({ initialItems = [] }) {
   const [active, setActive] = useState('all');
-  const [items, setItems] = useState(fallbackItems);
-
-  useEffect(() => {
-    fetch('/api/admin/menu')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.items && data.items.length > 0) {
-          setItems(data.items);
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const [items, setItems] = useState(initialItems);
 
   const filtered =
     active === 'all'
@@ -65,7 +53,7 @@ export default function MenuContent() {
                   <p className="text-text-muted">No items in this category right now.</p>
                 </motion.div>
               ) : (
-                <StaggerContainer key={active} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <StaggerContainer key={active} className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {filtered.map((item, index) => (
                     <FadeIn key={item.id}>
                       <MenuCard item={item} priority={index < 6} />
