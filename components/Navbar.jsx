@@ -21,8 +21,13 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [openNow, setOpenNow] = useState(false);
   const pathname = usePathname();
-  const openNow = isCurrentlyOpen();
+
+  // Compute live in the browser to avoid server/client hydration mismatch
+  useEffect(() => {
+    setOpenNow(isCurrentlyOpen());
+  }, []);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
