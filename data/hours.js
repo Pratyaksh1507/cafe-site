@@ -18,7 +18,7 @@ const hoursData = [
 ];
 
 // The cafe's local timezone — all open/closed logic must be evaluated in this zone.
-const CAFE_TZ = 'America/New_York';
+const CAFE_TZ = 'Asia/Kolkata';
 
 function timeToMinutes(time) {
   const [h, m] = time.split(':').map(Number);
