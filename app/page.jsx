@@ -2,10 +2,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Coffee, Leaf, Award, MapPin, Star } from 'lucide-react';
 import { menuItems, featuredItemIds } from '@/data/menu';
-import { getStoreStatus } from '@/data/hours';
 import MenuCard from '@/components/MenuCard';
 import HoursDisplay from '@/components/HoursDisplay';
 import { FadeIn, StaggerContainer } from '@/components/FadeIn';
+import StoreStatusBadge from '@/components/StoreStatusBadge';
 
 export const metadata = {
   title: 'Artisan Cafe | Specialty Coffee in Brooklyn',
@@ -54,8 +54,6 @@ const testimonials = [
 ];
 
 export default function HomePage() {
-  const status = getStoreStatus();
-
   return (
     <div className="min-h-screen">
       {/* ── Hero ── */}
@@ -80,20 +78,7 @@ export default function HomePage() {
           <div className="max-w-2xl">
             <FadeIn>
               <div className="mb-6">
-                <span
-                  className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium backdrop-blur-sm ${
-                    status.isOpen
-                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                      : 'bg-red-500/20 text-red-300 border border-red-500/30'
-                  }`}
-                >
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full animate-pulse ${
-                      status.isOpen ? 'bg-emerald-400' : 'bg-red-400'
-                    }`}
-                  />
-                  {status.text}
-                </span>
+                <StoreStatusBadge />
               </div>
             </FadeIn>
 
